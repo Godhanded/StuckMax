@@ -6,6 +6,10 @@ contract metastuck_movies_child{
 
     uint moviePrice;
     uint netValue;
+    uint comunityFunds;
+    uint modFunds;
+    uint valuebackpercent;
+    uint fees;
 
     address moderator;
     address dev;
@@ -15,18 +19,43 @@ contract metastuck_movies_child{
 
 
     error invalidAmount();
+    error invalidUser();
 
 
 
     receive() external payable
     {
-        if ((msg.value == moviePrice) && (block.timestamp>deadline[msg.sender])) 
+        uint amount= msg.value;
+        if ((amount == moviePrice) && (block.timestamp>deadline[msg.sender])) 
         {
-            netValue+=msg.value;
+            uint stuckFee= (amount * 5)/100;
+            amount-=stuckFee;
+            netValue+=amount;
+            comunityFunds+=amount*(valuebackpercent/100);
+            modFunds+=(amount-comunityFunds);
+            fees+=stuckFee;
             deadline[msg.sender]= block.timestamp + 1 days;
             viewGranted[msg.sender]=true;
         }else{
             revert invalidAmount();
+        }
+    }
+
+    function pullfunds()external 
+    {
+        if(msg.sender==moderator)
+        {
+            uint fee= fees;
+            uint moderatorValue=modFunds;
+            fees-=fee;
+            modFunds-=moderatorValue;
+            netValue-=(moderatorValue);
+            (bool sentmod, )= payable(moderator).call{value:moderatorValue}("");
+            (bool sentStuck, )= payable(dev).call{value:fee}("");
+            require((sentmod && sentStuck),"transaction failed");
+
+        }else{
+            revert invalidUser();
         }
     }
 
