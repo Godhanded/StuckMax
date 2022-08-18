@@ -21,6 +21,8 @@ contract stuckMaxFactory {
 
     error failed(string);
 
+    event childCreated(string indexed name, address indexed addr,string Uname);
+
     modifier onlyOwner {
         if (msg.sender== stuckmax)
         {
@@ -42,6 +44,7 @@ contract stuckMaxFactory {
         childName[_name]=childAddr;
         children.push(childInfo({name:_name,addr:childAddr}));
         totalChilden+=1;
+        emit childCreated(_name, childAddr, _name);
         return childAddr;
     }
 
