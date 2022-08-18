@@ -1,5 +1,5 @@
-//SPDX-License-Identifier: MIT
-pragma solidity ^0.8.5;
+// SPDX-License-Identifier: SEE LICENSE IN LICENSE
+pragma solidity ^0.8.7;
 
 contract metastuck_movies_child{
 
@@ -13,6 +13,7 @@ contract metastuck_movies_child{
 
     address moderator;
     address dev;
+    address factory;
 
     mapping (address=>bool) private viewGranted;
     mapping  (address=>uint) private deadline;
@@ -20,7 +21,21 @@ contract metastuck_movies_child{
 
     error invalidAmount();
     error invalidUser();
+    error failed(string);
+    
+    modifier onlyFactory {
+        if (msg.sender== factory)
+        {
+            _;
+        }else{
+            revert failed('only factory');
+        }
+    }
 
+    constructor()
+    {
+        factory=msg.sender;
+    }
 
 
     receive() external payable
@@ -70,7 +85,13 @@ contract metastuck_movies_child{
     }
 
 
-
+    function initialize(uint _price, uint _valueBack, address _mod, address _dev)external onlyFactory
+    {
+        moviePrice=_price;
+        valuebackpercent=_valueBack;
+        moderator=_mod;
+        dev=_dev;
+    }
 
 
 
