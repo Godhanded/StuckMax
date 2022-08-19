@@ -1,50 +1,52 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
+// solhint-disable-next-line
 pragma solidity ^0.8.7;
 
-import './Istuckchild.sol';
-import './stuckmaxChild.sol';
+import "./Istuckchild.sol";
+import "./stuckmaxChild.sol";
 
-contract stuckMaxFactory {
+contract StuckMaxFactory {
 
     address public stuckmax;
 
     uint public totalChilden;
 
-    mapping (string=>address)childName;
+    ChildInfo[] private children;
 
-    struct childInfo {
+    mapping(string=>address) public childName;
+
+    struct ChildInfo {
         string name;
         address addr;
     }
 
-    childInfo[] children;
 
-    error failed(string);
-
-    event childCreated(string indexed name, address indexed addr,string Uname);
+    event ChildCreated(string indexed name, address indexed addr,string tname);
 
     modifier onlyOwner {
         if (msg.sender== stuckmax)
         {
             _;
         }else{
-            revert failed('only owner');
+            revert failed("only owner");
         }
     }
+
+    error failed(string);
 
     constructor() {
         stuckmax=msg.sender;
     }
 
-    function generateChild(string calldata _name, uint _price, uint _valueBack)external returns(address)
+    function generateChild(string calldata _name, uint _price, uint _valueBack, address _sub)external returns(address)
     {
-        metastuck_movies_child child=new metastuck_movies_child();
+        MetastuckMoviesChild child=new MetastuckMoviesChild();
         address childAddr=address(child);
-        Istuckmaxchild(childAddr).initialize(_price, _valueBack, msg.sender, stuckmax);
+        Istuckmaxchild(childAddr).initialize(_price, _valueBack, msg.sender, stuckmax,_sub);
         childName[_name]=childAddr;
-        children.push(childInfo({name:_name,addr:childAddr}));
+        children.push(ChildInfo({name:_name,addr:childAddr}));
         totalChilden+=1;
-        emit childCreated(_name, childAddr, _name);
+        emit ChildCreated(_name, childAddr, _name);
         return childAddr;
     }
 
@@ -58,7 +60,7 @@ contract stuckMaxFactory {
         return childName[_name];
     }
 
-    function viewAllChild()external view returns(childInfo[] memory)
+    function viewAllChild()external view returns(ChildInfo[] memory)
     {
         return children;
     }

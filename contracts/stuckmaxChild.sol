@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
+// solhint-disable-next-line
 pragma solidity ^0.8.7;
 
-contract metastuck_movies_child{
+import "./Isubscription.sol";
+
+contract MetastuckMoviesChild{
 
 
     uint moviePrice;
@@ -14,9 +17,9 @@ contract metastuck_movies_child{
     address moderator;
     address dev;
     address factory;
+    address sub;
 
-    mapping (address=>bool) private viewGranted;
-    mapping  (address=>uint) private deadline;
+    mapping(address=>uint) private deadline;
 
 
     error invalidAmount();
@@ -28,7 +31,7 @@ contract metastuck_movies_child{
         {
             _;
         }else{
-            revert failed('only factory');
+            revert failed("only factory");
         }
     }
 
@@ -50,7 +53,6 @@ contract metastuck_movies_child{
             modFunds+=(amount-comunityFunds);
             fees+=stuckFee;
             deadline[msg.sender]= block.timestamp + 1 days;
-            viewGranted[msg.sender]=true;
         }else{
             revert invalidAmount();
         }
@@ -74,9 +76,16 @@ contract metastuck_movies_child{
         }
     }
 
-    function hasAccess(address addr) external view returns(bool)
+    function hasAccess(address _addr) external view returns(bool)
     {
-        return viewGranted[addr];
+        if(deadline[msg.sender]>=block.timestamp)
+        {
+            return true;
+        }else if(Isubscription(sub).validTill(_addr)>=block.timestamp){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     function getTimeLeft(address addr) external view returns(uint)
@@ -85,12 +94,13 @@ contract metastuck_movies_child{
     }
 
 
-    function initialize(uint _price, uint _valueBack, address _mod, address _dev)external onlyFactory
+    function initialize(uint _price, uint _valueBack, address _mod, address _dev,address _sub)external onlyFactory
     {
         moviePrice=_price;
         valuebackpercent=_valueBack;
         moderator=_mod;
         dev=_dev;
+        sub=_sub;
     }
 
 
