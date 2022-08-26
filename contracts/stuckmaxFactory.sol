@@ -1,9 +1,20 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
+/** 
+ ██████╗  ██████╗ ██████╗  █████╗ ███╗   ██╗██████╗ 
+██╔════╝ ██╔═══██╗██╔══██╗██╔══██╗████╗  ██║██╔══██╗
+██║  ███╗██║   ██║██║  ██║███████║██╔██╗ ██║██║  ██║
+██║   ██║██║   ██║██║  ██║██╔══██║██║╚██╗██║██║  ██║
+╚██████╔╝╚██████╔╝██████╔╝██║  ██║██║ ╚████║██████╔╝
+ ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ 
+*/ 
+
 // solhint-disable-next-line
 pragma solidity ^0.8.7;
 
 import "./Istuckchild.sol";
 import "./stuckmaxChild.sol";
+
+error notOwner(string);
 
 contract StuckMaxFactory {
 
@@ -20,6 +31,7 @@ contract StuckMaxFactory {
         address addr;
     }
 
+ 
 
     event ChildCreated(string indexed name, address indexed addr,string tname);
 
@@ -28,11 +40,10 @@ contract StuckMaxFactory {
         {
             _;
         }else{
-            revert failed("only owner");
+            revert notOwner("only owner");
         }
     }
 
-    error failed(string);
 
     constructor() {
         stuckmax=msg.sender;

@@ -1,6 +1,17 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
+/** 
+ ██████╗  ██████╗ ██████╗  █████╗ ███╗   ██╗██████╗ 
+██╔════╝ ██╔═══██╗██╔══██╗██╔══██╗████╗  ██║██╔══██╗
+██║  ███╗██║   ██║██║  ██║███████║██╔██╗ ██║██║  ██║
+██║   ██║██║   ██║██║  ██║██╔══██║██║╚██╗██║██║  ██║
+╚██████╔╝╚██████╔╝██████╔╝██║  ██║██║ ╚████║██████╔╝
+ ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ 
+*/                                
 // solhint-disable-next-line
 pragma solidity ^0.8.7;
+
+
+error failed();
 
 contract Subscriptions {
 
@@ -22,7 +33,6 @@ contract Subscriptions {
         }
     }
 
-    error failed();
 
     constructor() {
         stuckMax=msg.sender;

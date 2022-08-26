@@ -1,8 +1,21 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
+/** 
+ ██████╗  ██████╗ ██████╗  █████╗ ███╗   ██╗██████╗ 
+██╔════╝ ██╔═══██╗██╔══██╗██╔══██╗████╗  ██║██╔══██╗
+██║  ███╗██║   ██║██║  ██║███████║██╔██╗ ██║██║  ██║
+██║   ██║██║   ██║██║  ██║██╔══██║██║╚██╗██║██║  ██║
+╚██████╔╝╚██████╔╝██████╔╝██║  ██║██║ ╚████║██████╔╝
+ ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ 
+*/ 
+                                                  
 // solhint-disable-next-line
 pragma solidity ^0.8.7;
 
 import "./Isubscription.sol";
+
+error invalidAmount();
+error invalidUser();
+error failed(string);
 
 contract MetastuckMoviesChild{
 
@@ -22,9 +35,6 @@ contract MetastuckMoviesChild{
     mapping(address=>uint) private deadline;
 
 
-    error invalidAmount();
-    error invalidUser();
-    error failed(string);
     
     modifier onlyFactory {
         if (msg.sender== factory)
