@@ -7,12 +7,17 @@
 ██║   ██║██║   ██║██║  ██║██╔══██║██║╚██╗██║██║  ██║
 ╚██████╔╝╚██████╔╝██████╔╝██║  ██║██║ ╚████║██████╔╝
  ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ 
-*/                                                   
-                                                    
+*/
+
 // solhint-disable-next-line
 pragma solidity ^0.8.7;
 
 interface Istuckmaxchild {
-    
-    function initialize(uint _price, uint _valueBack, address _mod, address _dev,address _sub)external;
+    function initialize(
+        uint256 _price,
+        uint256 _valueBack,
+        address _mod,
+        address _dev,
+        address _sub
+    ) external;
 }

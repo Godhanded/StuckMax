@@ -6,11 +6,11 @@
 ██║   ██║██║   ██║██║  ██║██╔══██║██║╚██╗██║██║  ██║
 ╚██████╔╝╚██████╔╝██████╔╝██║  ██║██║ ╚████║██████╔╝
  ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ 
-*/ 
-                                                  
+*/
+
 // solhint-disable-next-line
 pragma solidity ^0.8.7;
 
 interface Isubscription {
-    function validTill(address _addr)external view returns(uint);
+    function validTill(address _addr) external view returns (uint256);
 }
