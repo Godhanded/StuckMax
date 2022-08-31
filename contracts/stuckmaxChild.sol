@@ -12,6 +12,7 @@
 pragma solidity ^0.8.7;
 
 import "./Isubscription.sol";
+import "./IERC721.sol";
 
 error invalidAmount();
 error invalidUser();
@@ -25,13 +26,25 @@ contract MetastuckMoviesChild {
     uint256 public modFunds;
     uint256 public valuebackpercent;
     uint256 public fees;
+    uint256 public constant RATE=1000;
 
     address public moderator;
     address public dev;
     address public factory;
     address public sub;
 
+    struct Stake{
+        uint128 total;
+        uint128 lastClaimed;
+    }
+
+    IERC721 public nft;
+
     mapping(address => uint256) private deadline;
+    mapping(address => Stake) private stakers;
+    mapping(uint256 => address) private owners;
+
+
 
     modifier onlyFactory() {
         if (msg.sender == factory) {
@@ -78,6 +91,18 @@ contract MetastuckMoviesChild {
         }
     }
 
+    function stake(uint256[] calldata tokenIds)external {
+        for (uint256 i; i < tokenIds.length;) {
+            nft.transferFrom(msg.sender, address(this), tokenIds[i]);
+
+            owners[tokenIds[i]]=msg.sender;
+            unchecked {
+                ++i;
+            }
+        }
+        stakers[msg.sender].total+=uint128(tokenIds.length);
+    }
+
     function hasAccess(address _addr) external view returns (bool) {
         if (
             (deadline[msg.sender] >= block.timestamp) ||
@@ -98,12 +123,14 @@ contract MetastuckMoviesChild {
         uint256 _valueBack,
         address _mod,
         address _dev,
-        address _sub
+        address _sub,
+        address _nft
     ) external onlyFactory {
         moviePrice = _price;
         valuebackpercent = _valueBack;
         moderator = _mod;
         dev = _dev;
         sub = _sub;
+        nft = IERC721(_nft);
     }
 }

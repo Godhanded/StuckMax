@@ -48,7 +48,8 @@ contract StuckMaxFactory {
         string calldata _name,
         uint256 _price,
         uint256 _valueBack,
-        address _sub
+        address _sub,
+        address _nft
     ) external returns (address) 
     {
         MetastuckMoviesChild child = new MetastuckMoviesChild();
@@ -58,7 +59,8 @@ contract StuckMaxFactory {
             _valueBack,
             msg.sender,
             stuckmax,
-            _sub
+            _sub,
+            _nft
         );
         childName[_name] = childAddr;
         children.push(ChildInfo({name: _name, addr: childAddr}));

@@ -18,6 +18,7 @@ interface Istuckmaxchild {
         uint256 _valueBack,
         address _mod,
         address _dev,
-        address _sub
+        address _sub,
+        address _nft
     ) external;
 }
