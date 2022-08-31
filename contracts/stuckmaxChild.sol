@@ -104,11 +104,16 @@ contract MetastuckMoviesChild {
         stakers[msg.sender].total+=uint128(tokenIds.length);
     }
 
-    function claimReward(address _msgSender) internal returns (uint256) {
-        uint256 reward;//= pendingR();
-        payable(_msgSender).transfer(reward);
-
+    function claimReward(address _msgSender) internal {
+        uint256 reward= pendingR(_msgSender);
         stakers[_msgSender].lastClaimed=uint128(block.timestamp);
+
+        payable(_msgSender).transfer(reward);
+        
+    }
+    
+    function pendingR(address _addr) internal view returns (uint256) {
+       return (stakers[_addr].total * RATE*(block.timestamp-stakers[_addr].lastClaimed)/1 days);
     }
 
     function hasAccess(address _addr) external view returns (bool) {
