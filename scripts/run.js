@@ -9,7 +9,7 @@ main= async()=> {
     let init;
     let value='0.05';
     let newValue= hre.ethers.utils.parseEther(value)
-    init= await factory.generateChild('testMovie',newValue, 5);
+    init= await factory.generateChild('testMovie',newValue, 5,user.address);
     let txreceipt= await init.wait();
     const Events= txreceipt.events.find(event=>event.event==='ChildCreated')
     const [name,addr,uname]=Events.args;
