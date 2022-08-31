@@ -104,6 +104,23 @@ contract MetastuckMoviesChild {
         stakers[msg.sender].total+=uint128(tokenIds.length);
     }
 
+    function unStake(uint256[] calldata tokenIds)external
+    {
+        claimReward(msg.sender);
+        for (uint i; i < tokenIds.length;) {
+            address owner=owners[tokenIds[i]];
+            if(owner != msg.sender) revert invalidUser();
+            delete owners[tokenIds[i]];
+            nft.transferFrom(address(this),owner,tokenIds[i]);
+            
+          
+            unchecked {
+                ++i;
+            }
+        }
+        stakers[msg.sender].total-=uint128(tokenIds.length);
+    }
+
     function claimReward(address _msgSender) internal {
         uint256 reward= pendingR(_msgSender);
         stakers[_msgSender].lastClaimed=uint128(block.timestamp);
@@ -129,6 +146,10 @@ contract MetastuckMoviesChild {
 
     function getTimeLeft(address addr) external view returns (uint256) {
         return deadline[addr];
+    }
+
+    function totalStaked() external view returns (uint256) {
+        return stakers[msg.sender].total;
     }
 
     function initialize(
