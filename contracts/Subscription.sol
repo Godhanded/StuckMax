@@ -39,8 +39,9 @@ contract Subscriptions {
     }
 
 
-    constructor() {
+    constructor(uint256 _price) {
         stuckMax=msg.sender;
+        price= _price;
     }
 
     
@@ -77,9 +78,13 @@ contract Subscriptions {
         require(sent,"transaction failed");
     }
 
+    function setPrice(uint256 _amount)external onlyOwner noContracts
+    {
+        price=_amount;
+    }
+
     function viewBalance()external view returns(uint)
     {
-        if(msg.sender!=stuckMax) return 0;
         return balance;
     }
 
