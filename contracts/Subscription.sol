@@ -33,13 +33,18 @@ contract Subscriptions {
         }
     }
 
+    modifier noContracts {
+        if(tx.origin!=msg.sender) revert failed();
+        _;
+    }
+
 
     constructor() {
         stuckMax=msg.sender;
     }
 
     
-    receive()external payable
+    receive()external payable noContracts
     {
         if ((msg.value==price) && (block.timestamp>=subscribed[msg.sender])){
             balance+=msg.value;
@@ -50,7 +55,7 @@ contract Subscriptions {
         }
     }
 
-    function subscribeFor(address _addr)external payable
+    function subscribeFor(address _addr)external payable noContracts
     {
         if ((msg.value==price) && (block.timestamp>=subscribed[msg.sender])) {
             subscribed[_addr] = block.timestamp + 30 days;
@@ -60,20 +65,21 @@ contract Subscriptions {
         }
     }
 
-    function changeOwner(address _addr)external onlyOwner
+    function changeOwner(address _addr)external onlyOwner noContracts
     {
         stuckMax=_addr;
     }
 
-    function pullFunds(uint _amount)external onlyOwner
+    function pullFunds(uint _amount)external onlyOwner noContracts
     {
         balance-=_amount;
         (bool sent,)= payable(stuckMax).call{value:_amount}("");
         require(sent,"transaction failed");
     }
 
-    function viewBalance()external view onlyOwner returns(uint)
+    function viewBalance()external view returns(uint)
     {
+        if(msg.sender!=stuckMax) return 0;
         return balance;
     }
 
