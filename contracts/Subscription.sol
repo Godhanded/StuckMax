@@ -6,91 +6,89 @@
 ██║   ██║██║   ██║██║  ██║██╔══██║██║╚██╗██║██║  ██║
 ╚██████╔╝╚██████╔╝██████╔╝██║  ██║██║ ╚████║██████╔╝
  ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ 
-*/                                
+*/
 // solhint-disable-next-line
 pragma solidity ^0.8.7;
-
 
 error failed();
 
 contract Subscriptions {
-
     address private stuckMax;
 
-    uint public price;
-    uint private balance;
+    uint256 public price;
+    uint256 private balance;
 
-    mapping(address => uint) public subscribed;
+    mapping(address => uint256) public subscribed;
 
-    event ValidSubscription(address indexed addr, uint period);
+    event ValidSubscription(address indexed addr, uint256 period);
 
-    modifier onlyOwner {
-        if (msg.sender== stuckMax)
-        {
+    modifier onlyOwner() {
+        if (msg.sender == stuckMax) {
             _;
-        }else{
+        } else {
             revert failed();
         }
     }
 
-    modifier noContracts {
-        if(tx.origin!=msg.sender) revert failed();
+    modifier noContracts() {
+        if (tx.origin != msg.sender) revert failed();
         _;
     }
 
-
     constructor(uint256 _price) {
-        stuckMax=msg.sender;
-        price= _price;
+        stuckMax = msg.sender;
+        price = _price;
     }
 
-    
-    receive()external payable noContracts
+    receive() external payable noContracts 
     {
-        if ((msg.value==price) && (block.timestamp>=subscribed[msg.sender])){
-            balance+=msg.value;
+        if (
+            (msg.value == price) && (block.timestamp >= subscribed[msg.sender])
+        ) {
+            balance += msg.value;
             subscribed[msg.sender] = block.timestamp + 30 days;
             emit ValidSubscription(msg.sender, subscribed[msg.sender]);
-        }else{
+        } else {
             revert failed();
         }
     }
 
-    function subscribeFor(address _addr)external payable noContracts
+    function subscribeFor(address _addr) external payable noContracts 
     {
-        if ((msg.value==price) && (block.timestamp>=subscribed[msg.sender])) {
+        if (
+            (msg.value == price) && (block.timestamp >= subscribed[msg.sender])
+        ) {
             subscribed[_addr] = block.timestamp + 30 days;
             emit ValidSubscription(msg.sender, subscribed[_addr]);
-        }else{
+        } else {
             revert failed();
         }
     }
 
-    function changeOwner(address _addr)external onlyOwner noContracts
+    function changeOwner(address _addr) external onlyOwner noContracts 
     {
-        stuckMax=_addr;
+        stuckMax = _addr;
     }
 
-    function pullFunds(uint _amount)external onlyOwner noContracts
+    function pullFunds(uint256 _amount) external onlyOwner noContracts 
     {
-        balance-=_amount;
-        (bool sent,)= payable(stuckMax).call{value:_amount}("");
-        require(sent,"transaction failed");
+        balance -= _amount;
+        (bool sent, ) = payable(stuckMax).call{value: _amount}("");
+        require(sent, "transaction failed");
     }
 
-    function setPrice(uint256 _amount)external onlyOwner noContracts
+    function setPrice(uint256 _amount) external onlyOwner noContracts 
     {
-        price=_amount;
+        price = _amount;
     }
 
-    function viewBalance()external view returns(uint)
+    function viewBalance() external view returns (uint256) 
     {
         return balance;
     }
 
-    function validTill(address _addr)external view returns(uint)
+    function validTill(address _addr) external view returns (uint256) 
     {
         return subscribed[_addr];
     }
-
 }

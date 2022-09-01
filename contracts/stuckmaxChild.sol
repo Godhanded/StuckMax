@@ -26,14 +26,14 @@ contract MetastuckMoviesChild {
     uint256 public modFunds;
     uint256 public valuebackpercent;
     uint256 public fees;
-    uint256 public constant RATE=1000;
+    uint256 public constant RATE = 1000;
 
     address public moderator;
     address public dev;
     address public factory;
     address public sub;
 
-    struct Stake{
+    struct Stake {
         uint128 total;
         uint128 lastClaimed;
     }
@@ -44,8 +44,6 @@ contract MetastuckMoviesChild {
     mapping(address => Stake) private stakers;
     mapping(uint256 => address) private owners;
 
-
-
     modifier onlyFactory() {
         if (msg.sender == factory) {
             _;
@@ -54,11 +52,17 @@ contract MetastuckMoviesChild {
         }
     }
 
+    modifier noContracts() {
+        if (tx.origin != msg.sender) revert failed();
+        _;
+    }
+
     constructor() {
         factory = msg.sender;
     }
 
-    receive() external payable {
+    receive() external payable noContracts
+    {
         uint256 amount = msg.value;
         if (
             (amount == moviePrice) && (block.timestamp > deadline[msg.sender])
@@ -75,14 +79,17 @@ contract MetastuckMoviesChild {
         }
     }
 
-    function pullfunds() external {
+    function pullfunds() external noContracts
+    {
         if (msg.sender == moderator) {
             uint256 fee = fees;
             uint256 moderatorValue = modFunds;
             fees -= fee;
             modFunds -= moderatorValue;
             netValue -= (moderatorValue);
-            (bool sentMod, ) = payable(moderator).call{value: moderatorValue}("");
+            (bool sentMod, ) = payable(moderator).call{value: moderatorValue}(
+                ""
+            );
             (bool sentStuck, ) = payable(dev).call{value: fee}("");
             if (!(sentMod && sentStuck)) revert failed();
             //require((sentmod && sentStuck),"transaction failed");
@@ -91,49 +98,53 @@ contract MetastuckMoviesChild {
         }
     }
 
-    function stake(uint256[] calldata tokenIds)external {
-        claimReward(msg.sender);
-        for (uint256 i; i < tokenIds.length;) {
-            nft.transferFrom(msg.sender, address(this), tokenIds[i]);
-
-            owners[tokenIds[i]]=msg.sender;
-            unchecked {
-                ++i;
-            }
-        }
-        stakers[msg.sender].total+=uint128(tokenIds.length);
-    }
-
-    function unStake(uint256[] calldata tokenIds)external
+    function stake(uint256[] calldata tokenIds) external noContracts
     {
         claimReward(msg.sender);
-        for (uint i; i < tokenIds.length;) {
-            address owner=owners[tokenIds[i]];
-            if(owner != msg.sender) revert invalidUser();
-            delete owners[tokenIds[i]];
-            nft.transferFrom(address(this),owner,tokenIds[i]);
-            
-          
+        for (uint256 i; i < tokenIds.length; ) {
+            nft.transferFrom(msg.sender, address(this), tokenIds[i]);
+
+            owners[tokenIds[i]] = msg.sender;
             unchecked {
                 ++i;
             }
         }
-        stakers[msg.sender].total-=uint128(tokenIds.length);
+        stakers[msg.sender].total += uint128(tokenIds.length);
     }
 
-    function claimReward(address _msgSender) internal {
-        uint256 reward= pendingR(_msgSender);
-        stakers[_msgSender].lastClaimed=uint128(block.timestamp);
+    function unStake(uint256[] calldata tokenIds) external noContracts
+    {
+        claimReward(msg.sender);
+        for (uint256 i; i < tokenIds.length; ) {
+            address owner = owners[tokenIds[i]];
+            if (owner != msg.sender) revert invalidUser();
+            delete owners[tokenIds[i]];
+            nft.transferFrom(address(this), owner, tokenIds[i]);
+
+            unchecked {
+                ++i;
+            }
+        }
+        stakers[msg.sender].total -= uint128(tokenIds.length);
+    }
+
+    function claimReward(address _msgSender) internal 
+    {
+        uint256 reward = pendingR(_msgSender);
+        stakers[_msgSender].lastClaimed = uint128(block.timestamp);
 
         payable(_msgSender).transfer(reward);
-        
-    }
-    
-    function pendingR(address _addr) internal view returns (uint256) {
-       return (stakers[_addr].total * RATE*(block.timestamp-stakers[_addr].lastClaimed)/1 days);
     }
 
-    function hasAccess(address _addr) external view returns (bool) {
+    function pendingR(address _addr) internal view returns (uint256) 
+    {
+        return ((stakers[_addr].total *
+            RATE *
+            (block.timestamp - stakers[_addr].lastClaimed)) / 1 days);
+    }
+
+    function hasAccess(address _addr) external view returns (bool) 
+    {
         if (
             (deadline[_addr] >= block.timestamp) ||
             (Isubscription(sub).validTill(_addr) >= block.timestamp)
@@ -144,11 +155,13 @@ contract MetastuckMoviesChild {
         }
     }
 
-    function getTimeLeft(address addr) external view returns (uint256) {
+    function getTimeLeft(address addr) external view returns (uint256) 
+    {
         return deadline[addr];
     }
 
-    function totalStaked() external view returns (uint256) {
+    function totalStaked() external view returns (uint256) 
+    {
         return stakers[msg.sender].total;
     }
 

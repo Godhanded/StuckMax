@@ -18,6 +18,7 @@ error notOwner(string);
 
 contract StuckMaxFactory {
     address public stuckmax;
+    address public sub;
 
     uint256 public totalChilden;
 
@@ -40,18 +41,17 @@ contract StuckMaxFactory {
         }
     }
 
-    constructor() {
+    constructor(address _sub) {
         stuckmax = msg.sender;
+        sub = _sub;
     }
 
     function generateChild(
         string calldata _name,
         uint256 _price,
         uint256 _valueBack,
-        address _sub,
         address _nft
-    ) external returns (address) 
-    {
+    ) external returns (address) {
         MetastuckMoviesChild child = new MetastuckMoviesChild();
         address childAddr = address(child);
         Istuckmaxchild(childAddr).initialize(
@@ -59,7 +59,7 @@ contract StuckMaxFactory {
             _valueBack,
             msg.sender,
             stuckmax,
-            _sub,
+            sub,
             _nft
         );
         childName[_name] = childAddr;
@@ -72,6 +72,11 @@ contract StuckMaxFactory {
     function changeStuckMax(address addr) external onlyOwner 
     {
         stuckmax = addr;
+    }
+
+    function setSub(address _addr) external onlyOwner 
+    {
+        sub = _addr;
     }
 
     function findByName(string calldata _name) external view returns (address) 
