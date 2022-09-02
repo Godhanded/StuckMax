@@ -131,7 +131,9 @@ contract MetastuckMoviesChild {
     function claimReward(address _msgSender) internal 
     {
         uint256 reward = pendingR(_msgSender);
+        if (reward>comunityFunds) revert failed();
         stakers[_msgSender].lastClaimed = uint128(block.timestamp);
+        comunityFunds-=reward;
 
         payable(_msgSender).transfer(reward);
     }
@@ -158,6 +160,14 @@ contract MetastuckMoviesChild {
     function getTimeLeft(address addr) external view returns (uint256) 
     {
         return deadline[addr];
+    }
+
+    function modBal()external view returns(uint256){
+        return modFunds;
+    }
+    
+    function communityBal()external view returns(uint256){
+        return comunityFunds;
     }
 
     function totalStaked() external view returns (uint256) 
